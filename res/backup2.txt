@@ -1,0 +1,865 @@
+
+from tkinter import *
+import tkinter as tk
+from tkinter import filedialog
+from tkinter import messagebox
+import cv2
+from numpy import *
+import os
+import numpy as np
+from PIL import Image, ImageTk
+from PIL import ImageEnhance
+'''    ------------------------  Globel Veriables  '''
+always_keep_orignel_image = ""
+image_globel = ""
+image_final = ""
+save_object = ""
+image_filename = ""
+image_save_main = ""
+image_save_pasport = ""
+image_save_icon = ""
+video_path_globle="---------------------------------> Select Video <---------------------------------"
+video_savepath_globle="---------------------------------> Select Destination <---------------------------------"
+start_framing=""
+end_framing=""
+
+'''    ------------------------     Functions           '''
+
+
+def save_fun(key):
+    if key == 1:
+        if image_save_main != "":
+            path_name = filedialog.asksaveasfile(mode='w', defaultextension=".jpg")
+            if not path_name:
+                return
+            else:
+                image_save_main.save(path_name)
+        else:
+            messagebox.showerror("Error", "Image note Found")
+    elif key == 2:
+        if image_save_pasport != "":
+            path_name = filedialog.asksaveasfile(mode='w', defaultextension=".jpg")
+            if not path_name:
+                return
+            else:
+                image_save_pasport.save(path_name)
+        else:
+            messagebox.showerror("Error", "Image note Found")
+    elif key == 3:
+        if image_save_icon != "":
+            path_name = filedialog.asksaveasfile(mode='w', defaultextension=".ico")
+            if not path_name:
+                return
+            else:
+                image_save_icon.save(path_name)
+        else:
+            messagebox.showerror("Error", "Image note Found")
+
+
+def default_fun():
+    global image_final
+    global image_globel
+    background_panal_image = Image.open("main.jpg")
+    resize_background_panal_image = background_panal_image.resize((247, 380), Image.ANTIALIAS)
+    final_backgroung_panal_image = ImageTk.PhotoImage(resize_background_panal_image)
+    background_image_panal_label = Label(window, borderwidth=4, relief=SUNKEN)
+    background_image_panal_label.configure(image=final_backgroung_panal_image)
+    background_image_panal_label.image = final_backgroung_panal_image
+    background_image_panal_label.place(x=160, y=80)
+    image_final = ""
+    image_globel = ""
+
+
+def brows_fun():
+    global image_filename
+    image_filename = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select Image",
+                                                filetypes=(("JPG files", "*.jpg*"),
+                                                           ("PNG Files", "*.png"),
+                                                           ("All Files", "*.*")))
+    if image_filename != "":
+        global always_keep_orignel_image
+        global image_final
+        global image_globel
+        always_keep_orignel_image = image_filename
+        image_globel = image_filename
+        img = Image.open(image_filename)
+        resize_image = img.resize((247, 380), Image.ANTIALIAS)
+        image_final = ImageTk.PhotoImage(resize_image)
+        picture_lable = Label(window, borderwidth=4, relief=SUNKEN)
+        picture_lable.configure(image=image_final)
+        picture_lable.image = image_final
+        picture_lable.place(x=160, y=80)
+    else:
+        default_fun()
+    return 1
+
+
+def save_brows_function():
+    path=filedialog.asksaveasfilename(initialdir='\ ',title='Save File', filetypes=(('JPEG','*.jpeg'),('icon','*.ico')))
+    cv2.imwrite('processed_saveobject_image.png', save_object)
+
+
+def feltered_image_frame_1(key):
+    global image_globel
+    if key == 1:
+        filter_try_one(image_globel)
+    elif key == 2:
+        filter_try_two(image_globel)
+    elif key == 3:
+        filter_try_three(image_globel)
+    elif key == 4:
+        filter_try_four(image_globel)
+    # elif key==5:
+    #     filter_try_five(image_globel)
+
+    path = "processed_abc_image.png"
+    image_globel = path
+    filtered_image2 = Image.open(path)
+    resize_image2 = filtered_image2.resize((247, 380), Image.ANTIALIAS)
+    final_image2 = ImageTk.PhotoImage(resize_image2)
+    return final_image2
+
+
+'''    ------------------------     Frame Functions           '''
+
+
+def filter_try_one(raw_image):
+    img = cv2.imread(raw_image)
+
+
+    #cv2.imwrite('processed_abc_image.png', processed_image)
+
+    return 1
+
+def filter_try_two(raw_image):
+    image = Image.open(raw_image)
+    #image.show()
+    '''
+    enh_bri = ImageEnhance.Brightness(image)
+    brightness = 1.5
+    image_brightened = enh_bri.enhance(brightness)
+    #image_brightened.show()
+
+    enh_col = ImageEnhance.Color(image_brightened)
+    color = 1.5
+    image_colored = enh_col.enhance(color)
+    #image_colored.show()
+
+    enh_con = ImageEnhance.Contrast(image_colored)
+    contrast = 1.5
+    image_contrasted = enh_con.enhance(contrast)
+    #image_contrasted.show()
+    '''
+
+    enh_sha = ImageEnhance.Sharpness(image)
+    sharpness = 5.0
+    processed_image_e = enh_sha.enhance(sharpness)
+    #processed_image.show()
+    processed_image=np.asarray(processed_image_e)
+    cv2.imwrite('processed_abc_image.png', processed_image)
+    return 1
+
+def filter_try_three(raw_image):
+    image=cv2.imread(raw_image)
+    image2 = cv2.cvtColor(image, cv2.COLOR_HSV2BGR)
+    image2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
+    figure_size = 9
+    new_image = cv2.blur(image2, (figure_size, figure_size))
+
+    processed_image=cv2.cvtColor(new_image,cv2.COLOR_GRAY2RGB)
+    cv2.imwrite('processed_abc_image.png', processed_image)
+
+    return 1
+
+def full_inverse_filter(image, psf):
+
+    return 1
+
+def filter_try_four(raw_image):
+    def get_kernel():
+        kernel = np.ones((4, 4), np.float32) / 15
+        return kernel
+
+    def dft_2d2():
+        global save_object, image_save_main
+        source = cv2.imread('processed_abc_image.png')
+        image = cv2.cvtColor(source, cv2.COLOR_BGR2RGB)
+        final_filtered_image = cv2.bilateralFilter(image, 9, 75, 75)
+        final_filtered_image2 = cv2.cvtColor(final_filtered_image, cv2.COLOR_BGR2RGB)
+        image_save_main = Image.fromarray(final_filtered_image2)
+        cv2.imwrite('processed_abc_image.png', final_filtered_image)
+        return 1
+
+    def dft_2de():
+        global save_object, image_save_main
+        for i in range(2):
+            source = cv2.imread('processed_abc_image.png')
+            image = cv2.cvtColor(source, cv2.COLOR_BGR2RGB)
+            final_filtered_image = cv2.bilateralFilter(image, 9, 75, 75)
+            cv2.imwrite('processed_abc_image.png', final_filtered_image)
+        picture2 = dft_2d2()
+        return 1
+
+    def dft_2d():
+        source = cv2.imread('processed_abc_image.png')
+        image = cv2.cvtColor(source, cv2.COLOR_BGR2RGB)
+        final_filtered_image = cv2.bilateralFilter(image, 9, 75, 75)
+
+        cv2.imwrite('processed_abc_image.png', final_filtered_image)
+        picture2 = dft_2d2()
+
+        return picture2
+
+    def idft_2d():
+        source = cv2.imread('processed_abc_image.png')
+        image = cv2.cvtColor(source, cv2.COLOR_BGR2RGB)
+        final_filtered_image = cv2.GaussianBlur(image, (5, 5), 5)
+        cv2.imwrite('processed_abc_image.png', final_filtered_image)
+        picture1 = dft_2d()
+        return picture1
+
+    global save_object
+    source = cv2.imread(raw_image)
+    image = cv2.cvtColor(source, cv2.COLOR_BGR2RGB)
+    shape_pixles_area = get_kernel()
+    final_filtered_image = cv2.filter2D(image, -1, shape_pixles_area)
+    cv2.imwrite('processed_abc_image.png', final_filtered_image)
+    picture = idft_2d()
+    return 1
+
+def try_text_image():
+    image0=image_globel
+    image=cv2.imread(image0,0)
+    _,processed_1=cv2.threshold(image,100,255,cv2.THRESH_BINARY)
+    cv2.imwrite('Thrash-saved.png', processed_1)
+    img = Image.open('Thrash-saved.png')
+    resize_image = img.resize((247, 380), Image.ANTIALIAS)
+    image_final = ImageTk.PhotoImage(resize_image)
+    picture_lable = Label(window, borderwidth=4, relief=SUNKEN)
+    picture_lable.configure(image=image_final)
+    picture_lable.image = image_final
+    picture_lable.place(x=160, y=80)
+    return 1
+
+def show_frames(key):
+    #     img = Image.open(key)
+    #     resize_frame = img.resize((400, 300), Image.ANTIALIAS)
+    #     resize_frame2=ImageTk.PhotoImage(resize_frame)
+    #     frame_lable = Label(window_campic)
+    #     frame_lable.configure(image=resize_frame2)
+    #     frame_lable.image = resize_frame2
+    #     frame_lable.place(x=10, y=300)
+    return 1
+
+def making_path(raw_path):
+    d=str(raw_path)
+    i=25
+    r_new_path=""
+    print(d[25])
+    while(d[i]!="'"):
+        r_new_path=r_new_path+d[i]
+        i=i+1
+    return r_new_path
+
+
+
+
+def video_cap(video_address,start_mod,end_mod):
+    cap = cv2.VideoCapture(f'{video_address}')
+    i = 1
+    if (start_mod == "0") & (end_mod == "0"):
+        while (cap.isOpened()):
+            ret, frame = cap.read()
+            if ret == True:
+                asd=cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                frame_image=Image.fromarray(asd)
+                secname=".jpg"
+                j=f'{video_savepath_globle}{i}{secname}'
+                frame_image.save(j)
+                i = i + 1
+            else:
+               break
+        cap.release()
+    elif(start_mod!="0")&(end_mod=="0"):
+        while (cap.isOpened()):
+            ret, frame = cap.read()
+            if ret == True:
+                if i >= int(start_mod):
+                    asd = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    frame_image = Image.fromarray(asd)
+                    secname = ".jpg"
+                    j = f'{video_savepath_globle}{i}{secname}'
+                    print(j, "\ntype\n")
+                    print(type(j))
+                    frame_image.save(j)
+
+            else:
+                break
+            i = i + 1
+        cap.release()
+
+    elif (start_mod == "0") & (end_mod != "0"):
+        while (cap.isOpened()):
+            ret, frame = cap.read()
+            if ret == True:
+                if i <= int(end_mod):
+                    asd = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    frame_image = Image.fromarray(asd)
+                    secname = ".jpg"
+                    j = f'{video_savepath_globle}{i}{secname}'
+                    print(j, "\ntype\n")
+                    print(type(j))
+                    frame_image.save(j)
+
+            else:
+                break
+            i = i + 1
+        cap.release()
+
+    elif (start_mod != "0") & (end_mod != "0"):
+        while (cap.isOpened()):
+            ret, frame = cap.read()
+            if ret == True:
+                if ((i >= int(start_mod))&((i <= int(end_mod)))):
+                    asd = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    frame_image = Image.fromarray(asd)
+                    secname = ".jpg"
+                    j = f'{video_savepath_globle}{i}{secname}'
+                    print(j, "\ntype\n")
+                    print(type(j))
+                    frame_image.save(j)
+
+            else:
+                break
+            i = i + 1
+    cap.release()
+
+    return 1
+
+
+def video_brows():
+    global video_path_globle
+    video_path_globle=filedialog.askopenfilename(initialdir=os.getcwd(), title="Select Video",
+                                                filetypes=(("mp4", "*.mp4"),
+                                                           ("avi", "*.avi"),
+                                                           ("All Files", "*.*")))
+
+def video_save_brows():
+    global video_savepath_globle
+    if  video_path_globle!="---------------------------------> Select Video <---------------------------------":
+        path =filedialog.asksaveasfile(mode='w')
+        print(path)
+        video_savepath_globle=making_path(path)
+        print(video_savepath_globle)
+    else:
+        messagebox.showerror("Error","Video Not Selected")
+    return 1
+
+def stream_main_control():
+    global video_path_globle,video_savepath_globle,start_framing,end_framing
+
+    if video_path_globle == "---------------------------------> Select Video <---------------------------------":
+        messagebox.showerror("Error", "Video Not Selected")
+    elif video_savepath_globle == "---------------------------------> Select Destination <---------------------------------":
+        messagebox.showerror("Error", "Video Not Selected")
+    else:
+
+        if((start_framing=="0")&(end_framing=="0")):# complete video frames
+            video_cap(video_path_globle, "0", "0")
+            video_savepath_globle = "---------------------------------> Select Destination <---------------------------------"
+            video_path_globle = "---------------------------------> Select Video <---------------------------------"
+
+
+        elif ((start_framing != "0") & (end_framing != "0")):# specfic periods frame
+            start=int(start_framing)
+            endr=int(end_framing)
+            finel_s_res=str(1800*start)
+            finel_e_res=str(1800*endr)
+            video_cap(video_path_globle, finel_s_res, finel_e_res)
+            video_savepath_globle = "---------------------------------> Select Destination <---------------------------------"
+            video_path_globle = "---------------------------------> Select Video <---------------------------------"
+            start_framing="0"
+            end_framing="0"
+
+        elif ((start_framing == "0") & (end_framing != "0")):# frams from Specfic Ending Point
+            endr = int(end_framing)
+            finel_e_res = str(1800 * endr)
+            video_cap(video_path_globle, "0", finel_e_res)
+            video_savepath_globle = "---------------------------------> Select Destination <---------------------------------"
+            video_path_globle = "---------------------------------> Select Video <---------------------------------"
+            start_framing = "0"
+            end_framing = "0"
+
+        elif ((start_framing != "0") & (end_framing == "0")):# frams from Specfic starting Point
+            start = int(start_framing)
+            finel_s_res = str(1800 * start)
+            video_cap(video_path_globle, finel_s_res, "0")
+            video_savepath_globle = "---------------------------------> Select Destination <---------------------------------"
+            video_path_globle = "---------------------------------> Select Video <---------------------------------"
+            start_framing = "0"
+            end_framing = "0"
+
+    return 1
+
+
+'''   ------------------------   Windows   '''
+
+def window_link():
+    if image_globel != "":
+        window_link= Toplevel()
+        app_weidth = 620
+        app_height = 700
+        window_link.iconbitmap("logoicon.ico")
+        screen_width = window_link.winfo_screenwidth()
+        screen_height = window_link.winfo_screenheight()
+        x = (screen_width / 2) - (app_weidth / 2)
+        y = (screen_height / 2) - (app_height / 2)
+        y =y-40
+        window_link.geometry(f'{app_weidth}x{app_height}+{int(x)}+{int(y)}')
+        window_link.maxsize(620, 700)
+        window_link.minsize(620, 700)
+        window_link.title("ButterFly Production")
+        window_link.configure(bg="orange")
+
+        button_lable=Button(window_link,text="Noice Remover",bg="yellow", font="Rockwell",width=25
+                            ,height=5).place(x=50,y=200)
+        button_lable2 = Button(window_link, text="Pasport Size", bg="yellow", font="Rockwell", width=25,
+                              height=5).place(x=350, y=200)
+        button_lable3 = Button(window_link, text="Icon Size", bg="yellow", font="Rockwell", width=25,
+                              height=5).place(x=50, y=350)
+        button_lable4 = Button(window_link, text="Text Enhancing", bg="yellow", font="Rockwell", width=25,
+                              height=5).place(x=350, y=350)
+        button_lable5 = Button(window_link, text="Noice Remover", bg="yellow", font="Rockwell", width=25,
+                               height=5).place(x=50, y=500)
+        button_lable6 = Button(window_link, text="Noice Remover", bg="yellow", font="Rockwell", width=25,
+                               height=5).place(x=350, y=500)
+        button_lable6 = Button(window_link, text="B a c k", bg="yellow", font="Rockwell", width=59,
+                               height=2,command=window_link.destroy).place(x=50, y=630)
+
+    else:
+        messagebox.showerror("Error", "Image Not found")
+    return 1
+
+def window_text():
+    if not image_globel != "":
+        window_text= Toplevel()
+        app_weidth = 900
+        app_height = 700
+        window_text.iconbitmap("logoicon.ico")
+        screen_width = window_text.winfo_screenwidth()
+        screen_height = window_text.winfo_screenheight()
+        x = (screen_width / 2) - (app_weidth / 2)
+        y = (screen_height / 2) - (app_height / 2)
+        y = y - 40
+
+        text_lable1 = Label(window_text, text="B e f o r e", bg="orange", fg="#0000A0", font="Algerian 20").place(x=171,
+                                                                                                                y=70)
+        text_lable2 = Label(window_text, text="A f t e r", bg="orange", fg="#0000A0", font="Algerian 20").place(x=590,
+                                                                                                              y=70)
+        window_text.geometry(f'{app_weidth}x{app_height}+{int(x)}+{int(y)}')
+        window_text.maxsize(900, 700)
+        window_text.minsize(900, 700)
+        window_text.title("ButterFly Production")
+        window_text.configure(bg="orange")
+        frame_line = Frame(window_text, bg="gold", height=2, width=600).place(x=150, y=520)
+        picture_Frame = Frame(window_text, height=390, width=255, bg="grey", borderwidth=4, relief=SUNKEN).place(x=110,
+                                                                                                               y=110)
+        image_lable = Label(window_text, borderwidth=4, relief=SUNKEN)
+        image_lable.configure(image=image_final)
+        image_lable.image = image_final
+        image_lable.place(x=110, y=110)
+        # -------------------After Filter-----------------
+
+        image_lable2 = Label(window_text, borderwidth=4, relief=SUNKEN)
+        image_lable2.configure(image=image_final)
+        image_lable2.image = image_final
+        image_lable2.place(x=550, y=110)
+
+        def direct_call_1():
+            final_image_return = nonzero
+            final_image_return = feltered_image_frame_1(5)
+            filter_display_result(final_image_return)
+
+        def direct_call_2():
+            for x in range(2):
+                final_image_return = nonzero
+                final_image_return = feltered_image_frame_1(6)
+                filter_display_result(final_image_return)
+
+        def direct_call_3():
+            final_image_return = nonzero
+            final_image_return = feltered_image_frame_1(7)
+            filter_display_result(final_image_return)
+
+        def direct_call_4():
+            final_image_return = nonzero
+            for i in range(1):
+                final_image_return = feltered_image_frame_1(8)
+                filter_display_result(final_image_return)
+
+        def save_fun_direct_call():
+            save_fun(1)
+            return 1
+
+        def filter_display_result(filtered_image_catcher):
+            global save_object
+            save_object = filtered_image_catcher
+            image_lable2 = Label(window_text, borderwidth=4, relief=SUNKEN)
+            image_lable2.configure(image=filtered_image_catcher)
+            image_lable2.image = filtered_image_catcher
+            image_lable2.place(x=550, y=110)
+
+        def resetfun():
+            global image_globel
+            image_globel = always_keep_orignel_image
+            img = Image.open(always_keep_orignel_image)
+            resize_image = img.resize((247, 380), Image.ANTIALIAS)
+            final_image = ImageTk.PhotoImage(resize_image)
+            image_lable2 = Label(window_text, borderwidth=4, relief=SUNKEN)
+            image_lable2.configure(image=final_image)
+            image_lable2.image = final_image
+            image_lable2.place(x=550, y=110)
+            return 1
+
+        def destroy_fun():
+            default_fun()
+            window_text.destroy()
+            # ---------------------  Algorithm Controls Buttons
+
+        algo_level1_button = Button(window_text, text="Normal", height=2, width=15, bg="gold",
+                                    command=direct_call_1).place(x=110, y=550)
+        algo_level2_button = Button(window_text, text="sharp", height=2, width=15, bg="gold",
+                                    command=direct_call_2).place(x=250, y=550)
+        algo_level3_button = Button(window_text, text="Advance", height=2, width=15, bg="gold",
+                                    command=direct_call_3).place(x=400, y=550)
+        algo_level4_button = Button(window_text, text="Ultra", height=2, width=15, bg="gold",
+                                    command=direct_call_4).place(x=550, y=550)
+        algo_level5_button = Button(window_text, text="Reset", height=2, width=15, bg="gold", command=resetfun).place(
+            x=700, y=550)
+        # --------------------- ------------------------ -------------- --------------- ------------------
+        buttonquit = Button(window_text, text="Back", width=30, height=2, bg="gold", command=window_text.destroy).place(
+            x=500, y=640)
+        # button_orignal_pic = Button(window_text, text="Orignel", width=30, height=2, bg="gold", command=default_fun).place(
+        #    x=130, y=510)
+        button_Save_pic = Button(window_text, text="S a v e", width=30, height=2, bg="gold",
+                                 command=save_fun_direct_call).place(x=200, y=640)
+    else:
+        messagebox.showerror("Error", "Image Not found")
+    return 1
+
+def window_two():
+    if image_globel != "":
+        windowtwo = Toplevel()
+        app_weidth = 900
+        app_height = 700
+        windowtwo.iconbitmap("logoicon.ico")
+        screen_width = windowtwo.winfo_screenwidth()
+        screen_height = windowtwo.winfo_screenheight()
+        x = (screen_width / 2) - (app_weidth / 2)
+        y = (screen_height / 2) - (app_height / 2)
+        y = y - 40
+
+        text_lable1 = Label(windowtwo, text="B e f o r e", bg="orange", fg="#0000A0", font="Algerian 20").place(x=171,
+                                                                                                                y=70)
+        text_lable2 = Label(windowtwo, text="A f t e r", bg="orange", fg="#0000A0", font="Algerian 20").place(x=590,
+                                                                                                              y=70)
+        windowtwo.geometry(f'{app_weidth}x{app_height}+{int(x)}+{int(y)}')
+        windowtwo.maxsize(900, 700)
+        windowtwo.minsize(900, 700)
+        windowtwo.title("ButterFly Production")
+        windowtwo.configure(bg="orange")
+        frame_line = Frame(windowtwo, bg="gold", height=2, width=600).place(x=150, y=520)
+        picture_Frame = Frame(windowtwo, height=390, width=255, bg="grey", borderwidth=4, relief=SUNKEN).place(x=110,
+                                                                                                               y=110)
+        image_lable = Label(windowtwo, borderwidth=4, relief=SUNKEN)
+        image_lable.configure(image=image_final)
+        image_lable.image = image_final
+        image_lable.place(x=110, y=110)
+        # -------------------After Filter-----------------
+
+        image_lable2 = Label(windowtwo, borderwidth=4, relief=SUNKEN)
+        image_lable2.configure(image=image_final)
+        image_lable2.image = image_final
+        image_lable2.place(x=550, y=110)
+
+        def direct_call_1():
+            final_image_return = nonzero
+            final_image_return = feltered_image_frame_1(1)
+            filter_display_result(final_image_return)
+
+        def direct_call_2():
+            for x in range(2):
+                final_image_return = nonzero
+                final_image_return = feltered_image_frame_1(2)
+                filter_display_result(final_image_return)
+
+        def direct_call_3():
+            final_image_return = nonzero
+            final_image_return = feltered_image_frame_1(3)
+            filter_display_result(final_image_return)
+
+        def direct_call_4():
+            final_image_return = nonzero
+            for i in range(1):
+                final_image_return = feltered_image_frame_1(4)
+                filter_display_result(final_image_return)
+
+        def save_fun_direct_call():
+            save_fun(1)
+            return 1
+
+        def filter_display_result(filtered_image_catcher):
+            global save_object
+            save_object = filtered_image_catcher
+            image_lable2 = Label(windowtwo, borderwidth=4, relief=SUNKEN)
+            image_lable2.configure(image=filtered_image_catcher)
+            image_lable2.image = filtered_image_catcher
+            image_lable2.place(x=550, y=110)
+
+        def resetfun():
+            global image_globel
+            image_globel = always_keep_orignel_image
+            img = Image.open(always_keep_orignel_image)
+            resize_image = img.resize((247, 380), Image.ANTIALIAS)
+            final_image = ImageTk.PhotoImage(resize_image)
+            image_lable2 = Label(windowtwo, borderwidth=4, relief=SUNKEN)
+            image_lable2.configure(image=final_image)
+            image_lable2.image = final_image
+            image_lable2.place(x=550, y=110)
+            return 1
+
+        def destroy_fun():
+            default_fun()
+            windowtwo.destroy()
+            # ---------------------  Algorithm Controls Buttons
+
+        algo_level1_button = Button(windowtwo, text="Normal", height=2, width=15, bg="gold",
+                                    command=direct_call_1).place(x=110, y=550)
+        algo_level2_button = Button(windowtwo, text="sharp", height=2, width=15, bg="gold",
+                                    command=direct_call_2).place(x=250, y=550)
+        algo_level3_button = Button(windowtwo, text="Advance", height=2, width=15, bg="gold",
+                                    command=direct_call_3).place(x=400, y=550)
+        algo_level4_button = Button(windowtwo, text="Ultra", height=2, width=15, bg="gold",
+                                    command=direct_call_4).place(x=550, y=550)
+        algo_level5_button = Button(windowtwo, text="Reset", height=2, width=15, bg="gold", command=resetfun).place(
+            x=700, y=550)
+        # --------------------- ------------------------ -------------- --------------- ------------------
+        buttonquit = Button(windowtwo, text="Back", width=30, height=2, bg="gold", command=windowtwo.destroy).place(
+            x=500, y=640)
+        # button_orignal_pic = Button(windowtwo, text="Orignel", width=30, height=2, bg="gold", command=default_fun).place(
+        #    x=130, y=510)
+        button_Save_pic = Button(windowtwo, text="S a v e", width=30, height=2, bg="gold",
+                                 command=save_fun_direct_call).place(x=200, y=640)
+    else:
+        messagebox.showerror("Error", "Image Not found")
+    return 1
+
+def window_three():
+    if image_filename != "":
+        windowthree = Toplevel()
+        windowthree.title("ButterFly Production")
+        windowthree.iconbitmap('logoicon.ico')
+        window_weidth = 900
+        window_heigth = 700
+        windowthree.minsize(900, 700)
+        windowthree.maxsize(900, 700)
+        screen_width2 = windowthree.winfo_screenwidth()
+        screen_height2 = windowthree.winfo_screenheight()
+        x = (screen_width2 / 2) - (window_weidth / 2)
+        y = (screen_height2 / 2) - (window_heigth / 2)
+        y = y - 40
+        windowthree.configure(bg="gold")
+
+        windowthree.geometry(f'{window_weidth}x{window_heigth}+{int(x)}+{int(y)}')
+        background_image_three = Image.open("aa.jpg")
+        background_image_win_three = Image.open(image_filename)
+        resized_background_image = background_image_three.resize((900, 700), Image.ANTIALIAS)
+        resized_background_image1 = background_image_win_three.resize((250, 390), Image.ANTIALIAS)
+        resized_background_image2 = background_image_win_three.resize((140, 210), Image.ANTIALIAS)
+        resized_background_image3 = background_image_win_three.resize((64, 58), Image.ANTIALIAS)
+        background_final_image = ImageTk.PhotoImage(resized_background_image)
+        background_final_image1 = ImageTk.PhotoImage(resized_background_image1)
+        background_final_image2 = ImageTk.PhotoImage(resized_background_image2)
+        background_final_image3 = ImageTk.PhotoImage(resized_background_image3)
+        global image_save_icon, image_save_pasport
+        image_array_icon = np.asarray(resized_background_image3)
+        image_save_icon = Image.fromarray(image_array_icon)
+        image_array_pasport = np.array(resized_background_image2)
+        image_save_pasport = Image.fromarray(image_array_pasport)
+
+        background_image_label0 = Label(windowthree)
+        background_image_label0.configure(image=background_final_image)
+        background_image_label0.image = background_final_image
+        background_image_label0.place(x=0, y=0)
+
+        background_image_label1 = Label(windowthree)
+        background_image_label1.configure(image=background_final_image1)
+        background_image_label1.image = background_final_image1
+        background_image_label1.place(x=110, y=160)
+
+        background_final_label2 = Label(windowthree)
+        background_final_label2.configure(imag=background_final_image2)
+        background_final_label2.image = background_final_image2
+        background_final_label2.place(x=450, y=260)
+
+        background_final_label3 = Label(windowthree)
+        background_final_label3.configure(image=background_final_image3)
+        background_final_label3.image = background_final_image3
+        background_final_label3.place(x=650, y=340)
+
+        def save_fun_direct_call_icon():
+            save_fun(3)
+            return 1
+
+        def save_fun_direct_call_pasport():
+            save_fun(2)
+            return 1
+
+        text_lable_win_three1 = Label(windowthree, text="Orignel pic", bg="white", fg="#0000A0",
+                                      font="Algerian 17").place(x=171, y=123)
+        text_lable_win_three2 = Label(windowthree, text="Pasport Size", bg="white", fg="#0000A0",
+                                      font="Algerian 13").place(x=462, y=230)
+        text_lable_win_three3 = Label(windowthree, text="Icon Size", bg="white", fg="#0000A0",
+                                      font="Algerian 10").place(x=652, y=315)
+        weidthpp = windowthree.winfo_screenwidth()
+        y_width = weidthpp / 2
+        button1_winthree = Button(windowthree, text="S a v e ", bg="White", fg="#0000A0", width=18,
+                                  command=save_fun_direct_call_pasport).place(x=452, y=477)
+        button1_winthree = Button(windowthree, text="S a v e ", bg="White", fg="#0000A0", width=8,
+                                  command=save_fun_direct_call_icon).place(
+            x=652, y=405)
+
+        # lable_text_arrow=Label(windowthree,text="----------- > > > ---------------- > > > --------------> > >",
+        #                        fg="#0000A0", font="Algerian 20").place(x=100,y=300)
+    else:
+        messagebox.showerror("Error", "Image Not Found")
+
+def window_cam():
+    window_campic=Toplevel()
+    window_campic.title("ButterFly Production")
+    window_campic.iconbitmap('logoicon.ico')
+    window_weidth = 900
+    window_heigth = 700
+    window_campic.minsize(700, 600)
+    window_campic.maxsize(700, 600)
+    screen_width2 = window_campic.winfo_screenwidth()
+    screen_height2 = window_campic.winfo_screenheight()
+    x = (screen_width2 / 2) - (window_weidth / 2)
+    y = (screen_height2 / 2) - (window_heigth / 2)
+    y = y - 40
+    window_campic.configure(bg="gold")
+    window_campic.geometry(f'{window_weidth}x{window_heigth}+{int(x)}+{int(y)}')
+
+    def text_show(address,mod):
+        if mod==1:
+            Path_text_lable=Label(window_campic,text=f'{address}',
+                           fg="blue",bg="gold",font="Forte 15").place(x=100,y=100)
+        elif mod==2:
+            Path_text_lable2 = Label(window_campic, text=f'{address}',
+                                    fg="blue", bg="gold", font="Forte 15").place(x=100, y=350)
+
+        return 1
+
+    def text_control():
+        video_brows()
+        text_show("------------------------------------------------------------------------------------",1)
+        text_show(video_path_globle,1)
+        return 1
+
+    def text_control_save():
+        video_save_brows()
+        text_show("------------------------------------------------------------------------------------",2)
+        text_show(video_savepath_globle,2)
+        return 1
+
+    def straem_in_control():
+        global start_framing,end_framing
+        start_framing=field_1.get()
+        end_framing=field_2.get()
+        if start_framing=="":
+            start_framing="0"
+        if end_framing=="":
+            end_framing="0"
+        print(start_framing)
+        print("\n",end_framing)
+        stream_main_control()
+        text_show(video_path_globle,1)
+        text_show(video_savepath_globle,2)
+
+    field_1=Entry(window_campic,width=5)
+    field_1.insert(0,"0")
+    field_1.place(x=250,y=220)
+
+    field_2 = Entry(window_campic, width=5)
+    field_2.insert(0, "0")
+    field_2.place(x=250, y=250)
+
+    field_text=Label(window_campic,text="Enter Mniuts From Framing Starts",bg="gold",fg="blue",font=("Constantia",10,"bold")).place(x=285,y=220)
+    field_text = Label(window_campic, text="Enter Mniuts From Fraims End", bg="gold", fg="blue",font=("Constantia",10,"bold")).place(x=285, y=250)
+    text_show(video_path_globle,1)
+    text_show(video_savepath_globle,2)
+    button_video_path=Button(window_campic,text="Brows",bg="yellow",
+                           font="Algerian 15",command=text_control).place(x=300,y=150)
+
+    button_video_frames = Button(window_campic, text="Brows", bg="yellow",
+                                 font="Algerian 15", command=text_control_save).place(x=300, y=400)
+
+    button_video_frames=Button(window_campic,text="Start Framing",bg="yellow",
+                           font="Algerian 15",command=straem_in_control).place(x=250,y=460)
+
+    '''
+    for x in range(24):
+        key=x+1
+        key2 = str(key)
+        ful_name = str(key2 + '+abc.png')
+        img = Image.open(ful_name)
+        resize_image = img.resize((300, 300), Image.ANTIALIAS)
+        image_final = ImageTk.PhotoImage(resize_image)
+        picture_lable = Label(window_cam)
+        picture_lable.configure(image=image_final)
+        picture_lable.image = image_final
+        picture_lable.place(x=5, y=5)
+    '''
+    return 1
+'''     ------------------------    Main Window     '''
+
+window = Tk()
+window.title("ButterFly Production")
+
+app_weidth = 600
+app_height = 700
+window.iconbitmap("logoicon.ico")
+screen_width = window.winfo_screenwidth()
+screen_height = window.winfo_screenheight()
+x = (screen_width / 2) - (app_weidth / 2)
+y = (screen_height / 2) - (app_height / 2)
+y = y - 40
+window.geometry(f'{app_weidth}x{app_height}+{int(x)}+{int(y)}')
+window.maxsize(600, 700)
+window.minsize(600, 700)
+background_image = Image.open("main.jpg")
+resize_background_image = background_image.resize((600, 700), Image.ANTIALIAS)
+final_backgroung_image = ImageTk.PhotoImage(resize_background_image)
+background_image_label = Label(window)
+background_image_label.configure(image=final_backgroung_image)
+background_image_label.image = final_backgroung_image
+background_image_label.place(x=0, y=0)
+
+# window.configure(background="orange")
+# manu_frame = Frame(window, bg="gold", height=30, borderwidth=3, relief=RIDGE).pack(fill=X)
+text_lable = Label(window, text="Filter   you   pic ", bg="orange", fg="#0000A0", font="Algerian 20").place(x=171, y=30)
+# picture_Frame = Frame(window, height=390, width=255,  borderwidth=4, relief=SUNKEN).place(x=160, y=90)
+button_brows = Button(window, text="B r o w s", width=30, height=2, bg="gold", command=brows_fun).place(x=172, y=480)
+buttonclear = Button(window, text="F i l t e r", width=30, height=2, bg="gold", command=window_two).place(x=172, y=530)
+button_brows2 = Button(window, text="C L E A R", width=30, height=2, bg="gold", command=default_fun).place(x=172, y=630)
+buttonconversion = Button(window, text="C o n v e r t ", width=30, height=2, bg="gold", command=window_three).place(
+    x=172, y=580)
+buttonquit = Button(window, text="Quit", width=6, height=1, bg="gold", command=window.quit).place(x=500, y=647)
+default_fun()
+#===========================
+test=Button(window,text="test image text",command=window_cam).place(x=400,y=530)
+
+
+
+
+window.mainloop()
